@@ -14,7 +14,7 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
 	target_link_libraries(
 			test_parser
 			GTest::gtest_main
-			sd_lib
+			ad_lib
 			fmt::fmt
 	)
 	include(GoogleTest)

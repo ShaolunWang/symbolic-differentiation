@@ -59,7 +59,7 @@ void Parser::parse_main() {
 
   // first we get all the out expr
   while (*it != "=") {
-    out_ctx.push_back(*it);
+    out_ctx.emplace_back(*it);
     it = input.erase(it);
     if (*it == ",") {
       it = input.erase(it);
@@ -72,7 +72,7 @@ void Parser::parse_main() {
   // if it's comma, we stop
   while (it != input.end()) {
     auto x = parse_plus_minus_expr();
-    this->operation_list.push_back(std::move(x));
+    this->operation_list.emplace_back(x);
     if (it == input.end() || input.empty()) {
       break;
     }
@@ -231,7 +231,7 @@ void Parser::gen_rev() {
     auto var = std::make_shared<Variable>(out_ctx[i]);
     std::vector<std::shared_ptr<Operation>> op_list{var};
     operation_list[i]->makeRevOp(op_list);
-    revOp_worklist.push_back(operation_list[i]);
+    revOp_worklist.emplace_back(operation_list[i]);
   }
   // bfs until worklist is cleared
 
@@ -252,7 +252,7 @@ void Parser::gen_rev() {
       for (auto &x : it->getChilds()) {
         std::vector<std::shared_ptr<Operation>> vec = it->getRevOps();
         x->makeRevOp(vec);
-        revOp_worklist.push_back(x);
+        revOp_worklist.emplace_back(x);
       }
     }
     revOp_worklist.erase(revOp_worklist.begin());

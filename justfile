@@ -7,13 +7,13 @@ clean:
 test:
 	./build/test/test_parser --gtest_color=yes
 run:
-	./build/sd 0 0
+	./build/ad 0 0
 forward_dump:
-	./build/sd 0 0
+	./build/ad 0 0
 rev_dump:
-	./build/sd 1 0 
+	./build/ad 1 0 
 forward_graph:
-	./build/sd 0 1 > out.dot &&  dot -Tsvg out.dot > out.svg
+	./build/ad 0 1 > out.dot &&  dot -Tsvg out.dot > out.svg
 rev_graph:
-	./build/sd 1 1 > rev.dot &&  dot -Tsvg rev.dot > rev.svg
+	./build/ad 1 1 > rev.dot &&  dot -Tsvg rev.dot > rev.svg
 

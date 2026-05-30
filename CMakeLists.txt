@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(SymbolicDifferentiation)
+project(AutomaticDifferentiation)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -74,11 +74,11 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif()
 add_subdirectory(src)
 add_executable(
-        sd
+        ad
 		main.cpp
 )
 target_link_libraries(
-        sd
+        ad
 		fmt::fmt
-		sd_lib
+		ad_lib
 )

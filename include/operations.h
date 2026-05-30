@@ -47,7 +47,6 @@ struct Operation {
     return lhs._name == rhs._name;
   };
 
-  // this really should be named something else..
   virtual void
   makeRevOp(std::vector<std::shared_ptr<Operation>> &in_operation) {};
 

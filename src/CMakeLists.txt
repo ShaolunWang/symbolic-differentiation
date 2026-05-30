@@ -1,12 +1,12 @@
 file(GLOB HEADER_LIST CONFIGURE_DEPENDS 
-	"${SymbolicDifferentiation_SOURCE_DIR}/include/*.h"
+	"${AutomaticDifferentiation_SOURCE_DIR}/include/*.h"
 )
 
-add_library(sd_lib operation.cpp  parser.cpp ${HEADER_LIST})
-target_link_libraries(sd_lib PUBLIC fmt::fmt )
-target_include_directories(sd_lib PUBLIC ../include)
+add_library(ad_lib operation.cpp  parser.cpp ${HEADER_LIST})
+target_link_libraries(ad_lib PUBLIC fmt::fmt )
+target_include_directories(ad_lib PUBLIC ../include)
 
-target_compile_features(sd_lib PUBLIC cxx_std_23)
+target_compile_features(ad_lib PUBLIC cxx_std_23)
 
 source_group(
   TREE "${PROJECT_SOURCE_DIR}/include"

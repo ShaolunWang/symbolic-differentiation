@@ -45,10 +45,10 @@ std::string transform(const std::string &input,
 
 int main(int argc, char *argv[]) {
   if (argc != 3) {
-    fmt::println("`sd 0 0` to generate forward mode, without graphviz output ",
-                 "`sd 0 1` to generate forward mode, with graphviz output ");
-    fmt::println("`sd 1 0` to generate reverse mode, without graphviz output",
-                 "`sd 1 1` to generate reverse mode, with graphviz output ");
+    fmt::println("`ad 0 0` to generate forward mode, without graphviz output ",
+                 "`ad 0 1` to generate forward mode, with graphviz output ");
+    fmt::println("`ad 1 0` to generate reverse mode, without graphviz output",
+                 "`ad 1 1` to generate reverse mode, with graphviz output ");
     return -1;
   }
   int mode = atoi(argv[1]);
@@ -58,20 +58,20 @@ int main(int argc, char *argv[]) {
   if (mode == 1 || mode == 0) {
     forward_mode = mode == 0;
   } else {
-    fmt::println("`sd 0 0` to generate forward mode, without graphviz output\n "
-                 "`sd 0 1` to generate forward mode, with graphviz output ");
-    fmt::println("`sd 1 0` to generate reverse mode, without graphviz output",
-                 "`sd 1 1` to generate reverse mode, with graphviz output");
+    fmt::println("`ad 0 0` to generate forward mode, without graphviz output\n "
+                 "`ad 0 1` to generate forward mode, with graphviz output ");
+    fmt::println("`ad 1 0` to generate reverse mode, without graphviz output",
+                 "`ad 1 1` to generate reverse mode, with graphviz output");
     return -1;
   }
 
   if (graph == 1 || graph == 0) {
     graph_mode = graph == 1;
   } else {
-    fmt::println("`sd 0 0` to generate forward mode, without graphviz output\n "
-                 "`sd 0 1` to generate forward mode, with graphviz output ");
-    fmt::println("`sd 1 0` to generate reverse mode, without graphviz output",
-                 "`sd 1 1` to generate reverse mode, with graphviz output");
+    fmt::println("`ad 0 0` to generate forward mode, without graphviz output\n "
+                 "`ad 0 1` to generate forward mode, with graphviz output ");
+    fmt::println("`ad 1 0` to generate reverse mode, without graphviz output",
+                 "`ad 1 1` to generate reverse mode, with graphviz output");
     return -1;
   }
   std::string example{
