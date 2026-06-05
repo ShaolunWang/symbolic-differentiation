@@ -3,10 +3,10 @@
 
 // checks whether the next token is the one we expect
 bool Parser::check(Token type) {
-  if (it == input.end()) {
+  if (m_it == m_input.end()) {
     return false;
   }
-  std::string tok = *it;
+  std::string tok = *m_it;
   bool result = false;
   switch (type) {
   case Token::VARNAME:
@@ -45,68 +45,68 @@ bool Parser::check(Token type) {
 // match if token is the one we expected
 bool Parser::match(Token type) {
   if (check(type)) {
-    this->it = input.erase(it);
+    this->m_it = m_input.erase(m_it);
     return true;
   }
   return false;
 }
 
-void Parser::parse_main() {
+void Parser::parseMain() {
   int idx = 0;
   // get all the output var names
   // for each one of them, we should generate a seperate graph
   // NOTE: it's probably possible to re-use subexpr
 
   // first we get all the out expr
-  while (*it != "=") {
-    out_ctx.emplace_back(*it);
-    it = input.erase(it);
-    if (*it == ",") {
-      it = input.erase(it);
+  while (*m_it != "=") {
+    m_outCtx.emplace_back(*m_it);
+    m_it = m_input.erase(m_it);
+    if (*m_it == ",") {
+      m_it = m_input.erase(m_it);
     }
   }
-  if (*it == "=") {
-    it = input.erase(it); // skip over "="
+  if (*m_it == "=") {
+    m_it = m_input.erase(m_it); // skip over "="
   }
   // now we are at the rhs of the expr list
   // if it's comma, we stop
-  while (it != input.end()) {
-    auto x = parse_plus_minus_expr();
-    this->operation_list.emplace_back(x);
-    if (it == input.end() || input.empty()) {
+  while (m_it != m_input.end()) {
+    auto x = parsePlusMinusExpr();
+    this->m_operationList.emplace_back(x);
+    if (m_it == m_input.end() || m_input.empty()) {
       break;
     }
     // erase `,`
-    if (*it == ",") {
-      it = input.erase(it);
+    if (*m_it == ",") {
+      m_it = m_input.erase(m_it);
     }
   }
 }
 
-std::shared_ptr<Operation> Parser::parse_expr() {
+std::shared_ptr<Operation> Parser::parseExpr() {
   std::shared_ptr<Operation> result;
   if (check(Token::LBRACKET)) {
     match(Token::LBRACKET);
-    result = parse_plus_minus_expr();
+    result = parsePlusMinusExpr();
     match(Token::RBRACKET);
     return result;
   }
   if (check(Token::VARNAME)) {
-    result = parse_variable();
+    result = parseVariable();
     return result;
   }
   return nullptr;
 }
 
-std::shared_ptr<Operation> Parser::parse_unary() {
+std::shared_ptr<Operation> Parser::parseUnary() {
   // unary has a higher precedence than expr
-  std::shared_ptr<Operation> lhs = parse_expr();
+  std::shared_ptr<Operation> lhs = parseExpr();
   if (check(Token::SQ)) {
     match(Token::SQ);
     lhs = std::make_shared<UnaryOp>(std::move(lhs), '^');
-    auto it = operation_ctx.find(lhs->_name);
-    if (it == operation_ctx.end()) {
-      operation_ctx.emplace(lhs->_name, lhs);
+    auto it = m_operationCtx.find(lhs->_name);
+    if (it == m_operationCtx.end()) {
+      m_operationCtx.emplace(lhs->_name, lhs);
     } else {
       lhs = it->second;
     }
@@ -116,8 +116,8 @@ std::shared_ptr<Operation> Parser::parse_unary() {
   return lhs;
 }
 
-std::shared_ptr<Operation> Parser::parse_plus_minus_expr() {
-  std::shared_ptr<Operation> lhs = parse_mul_div_expr();
+std::shared_ptr<Operation> Parser::parsePlusMinusExpr() {
+  std::shared_ptr<Operation> lhs = parseMulDivExpr();
 
   // find all add/sub tokens, build them into one operation
   while (check(Token::ADD) || check(Token::SUB)) {
@@ -129,11 +129,11 @@ std::shared_ptr<Operation> Parser::parse_plus_minus_expr() {
       tok = '-';
       match(Token::SUB);
     };
-    std::shared_ptr<Operation> rhs = parse_mul_div_expr();
+    std::shared_ptr<Operation> rhs = parseMulDivExpr();
     lhs = std::make_shared<BinaryOp>(std::move(lhs), tok, std::move(rhs));
-    auto it = operation_ctx.find(lhs->_name);
-    if (it == operation_ctx.end()) {
-      operation_ctx.emplace(lhs->_name, lhs);
+    auto it = m_operationCtx.find(lhs->_name);
+    if (it == m_operationCtx.end()) {
+      m_operationCtx.emplace(lhs->_name, lhs);
     } else {
       lhs = it->second;
     }
@@ -141,8 +141,8 @@ std::shared_ptr<Operation> Parser::parse_plus_minus_expr() {
   return lhs;
 }
 
-std::shared_ptr<Operation> Parser::parse_mul_div_expr() {
-  std::shared_ptr<Operation> lhs = parse_unary();
+std::shared_ptr<Operation> Parser::parseMulDivExpr() {
+  std::shared_ptr<Operation> lhs = parseUnary();
   // find all mul/div tokens, build them into one operation
   while (check(Token::MUL) || check(Token::DIV)) {
     char tok;
@@ -153,30 +153,30 @@ std::shared_ptr<Operation> Parser::parse_mul_div_expr() {
       tok = '/';
       match(Token::DIV);
     };
-    std::shared_ptr<Operation> rhs = parse_unary();
+    std::shared_ptr<Operation> rhs = parseUnary();
 
     lhs = std::make_shared<BinaryOp>(std::move(lhs), tok, std::move(rhs));
-    auto it = operation_ctx.find(lhs->_name);
-    if (it == operation_ctx.end()) {
-      operation_ctx.emplace(lhs->_name, lhs);
+    auto it = m_operationCtx.find(lhs->_name);
+    if (it == m_operationCtx.end()) {
+      m_operationCtx.emplace(lhs->_name, lhs);
     } else {
       lhs = it->second;
     }
   }
   return lhs;
 }
-std::shared_ptr<Operation> Parser::parse_variable() {
+std::shared_ptr<Operation> Parser::parseVariable() {
 
-  std::shared_ptr<Variable> var = std::make_shared<Variable>(*it);
-  if (std::ranges::find(name_ctx, *it) == name_ctx.end()) {
+  std::shared_ptr<Variable> var = std::make_shared<Variable>(*m_it);
+  if (std::ranges::find(m_nameCtx, *m_it) == m_nameCtx.end()) {
     throw std::runtime_error(
-        fmt::format("Variable {} not found in given set of input", *it));
+        fmt::format("Variable {} not found in given set of input", *m_it));
     exit(-1);
   }
   match(Token::VARNAME);
-  auto it = operation_ctx.find(var->_name);
-  if (it == operation_ctx.end()) {
-    operation_ctx.emplace(var->_name, var);
+  auto it = m_operationCtx.find(var->_name);
+  if (it == m_operationCtx.end()) {
+    m_operationCtx.emplace(var->_name, var);
     return var;
   }
 
@@ -184,34 +184,35 @@ std::shared_ptr<Operation> Parser::parse_variable() {
 }
 std::string Parser::dump() const {
   std::string result;
-  for (int i = 0; i < operation_list.size(); i++) {
-    result += fmt::format("{}:\n", out_ctx[i]);
-    result += operation_list[i]->dump();
+  for (int i = 0; i < m_operationList.size(); i++) {
+    result += fmt::format("{}:\n", m_outCtx[i]);
+    result += m_operationList[i]->dump();
     result += "\n";
   }
   return result;
 }
-std::string Parser::export_graphviz() {
+std::string Parser::exportGraphviz() {
   std::string result;
+
   result += "digraph G {\n";
-  for (int i = 0; i < operation_list.size(); i++) {
+  for (int i = 0; i < m_operationList.size(); i++) {
     result += fmt::format("subgraph tree_{} {}", i, '{');
     result += "\nnode [style=filled];\n";
-    result += fmt::format("\nedge [label={},dir=none];\n", out_ctx[i]);
-    result += fmt::format("{} -> ", out_ctx[i]);
-    result += operation_list[i]->export_graphviz(i);
+    result += fmt::format("\nedge [label={},dir=none];\n", m_outCtx[i]);
+    result += fmt::format("{} -> ", m_outCtx[i]);
+    result += m_operationList[i]->export_graphviz(i);
     result += "\n}\n";
   }
   result += "}\n";
   // also output the file
   return result;
 }
-std::string Parser::export_rev_graphviz() {
+std::string Parser::exportRevGraphviz() {
 
   std::string result;
   result += "digraph G {\n";
   int i = 0;
-  for (auto &x : rev_map) {
+  for (auto &x : m_revMap) {
     result += fmt::format("subgraph tree_{} {}", i, '{');
     result += "\nnode [style=filled];\n";
     result += fmt::format("\nedge [label={},dir=none];\n", i);
@@ -225,18 +226,18 @@ std::string Parser::export_rev_graphviz() {
 }
 
 ///// Rev OPERATIONS
-void Parser::gen_rev() {
+void Parser::genRev() {
   // doing the first batch manually
-  for (int i = 0; i < operation_list.size(); i++) {
-    auto var = std::make_shared<Variable>(out_ctx[i]);
+  for (int i = 0; i < m_operationList.size(); i++) {
+    auto var = std::make_shared<Variable>(m_outCtx[i]);
     std::vector<std::shared_ptr<Operation>> op_list{var};
-    operation_list[i]->makeRevOp(op_list);
-    revOp_worklist.emplace_back(operation_list[i]);
+    m_operationList[i]->makeRevOp(op_list);
+    m_revOpWorklist.emplace_back(m_operationList[i]);
   }
   // bfs until worklist is cleared
 
-  while (!revOp_worklist.empty()) {
-    auto it = revOp_worklist[0];
+  while (!m_revOpWorklist.empty()) {
+    auto it = m_revOpWorklist[0];
 
     // only put into the Rev result list iff current node does not have a
     // child, i.e. end
@@ -244,23 +245,23 @@ void Parser::gen_rev() {
       auto res = std::make_shared<RevOp>(it->getRevOps(), it->_name);
 
       // remove duplicated entries
-      auto it = rev_map.find(res->_name);
-      if (it == rev_map.end()) {
-        rev_map.emplace(res->_name, res);
+      auto it = m_revMap.find(res->_name);
+      if (it == m_revMap.end()) {
+        m_revMap.emplace(res->_name, res);
       }
     } else {
       for (auto &x : it->getChilds()) {
         std::vector<std::shared_ptr<Operation>> vec = it->getRevOps();
         x->makeRevOp(vec);
-        revOp_worklist.emplace_back(x);
+        m_revOpWorklist.emplace_back(x);
       }
     }
-    revOp_worklist.erase(revOp_worklist.begin());
+    m_revOpWorklist.erase(m_revOpWorklist.begin());
   }
 }
-std::string Parser::dump_rev() const {
+std::string Parser::dumpRev() const {
   std::string result;
-  for (const auto &x : rev_map) {
+  for (const auto &x : m_revMap) {
     result += '\n' + x.second->dump();
   }
   return result;

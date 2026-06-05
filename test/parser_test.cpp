@@ -15,7 +15,7 @@ TEST(Test, PlusMinusBrackets) {
       },
       {"a", "b", "c"});
 
-  parser.parse_main();
+  parser.parseMain();
   ASSERT_EQ(parser.dump(), "x:\n(a + (b - c))\n");
 }
 TEST(Test, PlusMinus) {
@@ -31,7 +31,7 @@ TEST(Test, PlusMinus) {
       },
       {"a", "b", "c"});
 
-  parser.parse_main();
+  parser.parseMain();
   ASSERT_EQ(parser.dump(), "x:\n((a + b) - c)\n");
 }
 TEST(Test, Variable) {
@@ -43,7 +43,7 @@ TEST(Test, Variable) {
       },
       {"a"});
 
-  parser.parse_main();
+  parser.parseMain();
   ;
   ASSERT_EQ(parser.dump(), "x:\na\n");
 }
@@ -60,13 +60,13 @@ TEST(Test, UnaryOperator) {
       },
       {"a"});
 
-  parser.parse_main();
+  parser.parseMain();
   ASSERT_EQ(parser.dump(), "x:\n(a ^ 2)\n");
 }
 TEST(Test, ParserComplexArith) {
   Parser parser({"x", ",", "y", "=", "a", "+", "b", ",", "a", "-", "b"},
                 {"a", "b"});
-  parser.parse_main();
+  parser.parseMain();
   ASSERT_EQ(parser.dump(), "x:\n(a + b)\ny:\n(a - b)\n");
 }
 
@@ -81,7 +81,7 @@ TEST(Test, ParserSimpleBracket) {
           ")",
       },
       {"a"});
-  parser.parse_main();
+  parser.parseMain();
   ASSERT_EQ(parser.dump(), "x:\na\n");
 }
 
@@ -98,7 +98,7 @@ TEST(Test, ParserHierarchy) {
           "c",
       },
       {"a", "b", "c"});
-  parser.parse_main();
+  parser.parseMain();
   ASSERT_EQ(parser.dump(), "x:\n(a + (b * c))\n");
 }
 TEST(Test, RevBasicAdd) {
@@ -111,9 +111,9 @@ TEST(Test, RevBasicAdd) {
           "b",
       },
       {"a", "b"});
-  parser.parse_main();
-  parser.gen_rev();
-  ASSERT_EQ(parser.dump_rev(), "\nb : \nx\nx\n\na : \nx\nx\n");
+  parser.parseMain();
+  parser.genRev();
+  ASSERT_EQ(parser.dumpRev(), "\nb : \nx\nx\n\na : \nx\nx\n");
 }
 TEST(Test, RevBasicMul) {
   Parser parser(
@@ -125,9 +125,9 @@ TEST(Test, RevBasicMul) {
           "b",
       },
       {"a", "b"});
-  parser.parse_main();
-  parser.gen_rev();
-  ASSERT_EQ(parser.dump_rev(),
+  parser.parseMain();
+  parser.genRev();
+  ASSERT_EQ(parser.dumpRev(),
             "\nb : \n(x * b)\n(x * a)\n\na : \n(x * b)\n(x * a)\n");
 }
 TEST(Test, RevBasicDiv) {
@@ -140,9 +140,9 @@ TEST(Test, RevBasicDiv) {
           "b",
       },
       {"a", "b"});
-  parser.parse_main();
-  parser.gen_rev();
-  ASSERT_EQ(parser.dump_rev(),
+  parser.parseMain();
+  parser.genRev();
+  ASSERT_EQ(parser.dumpRev(),
             "\nb : \n(x / b)\n(0 - (x * (a / (b ^ 2))))\n\na : \n(x / b)\n(0 - "
             "(x * (a / (b ^ 2))))\n");
 }
@@ -156,9 +156,9 @@ TEST(Test, RevBasicSub) {
           "b",
       },
       {"a", "b"});
-  parser.parse_main();
-  parser.gen_rev();
-  ASSERT_EQ(parser.dump_rev(), "\nb : \nx\n(0 - x)\n\na : \nx\n(0 - x)\n");
+  parser.parseMain();
+  parser.genRev();
+  ASSERT_EQ(parser.dumpRev(), "\nb : \nx\n(0 - x)\n\na : \nx\n(0 - x)\n");
 }
 TEST(Test, RevBasicSq) {
   Parser parser(
@@ -170,8 +170,8 @@ TEST(Test, RevBasicSq) {
           "2",
       },
       {"a"});
-  parser.parse_main();
-  parser.gen_rev();
+  parser.parseMain();
+  parser.genRev();
 
-  ASSERT_EQ(parser.dump_rev(), "\na : \n(2 * (x * a))\n");
+  ASSERT_EQ(parser.dumpRev(), "\na : \n(2 * (x * a))\n");
 }

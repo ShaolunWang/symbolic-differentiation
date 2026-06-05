@@ -22,10 +22,10 @@ static std::vector<std::string> simple_lexer(const std::string &input) {
 std::string run(const std::string &input, std::vector<std::string> &in_ctx,
                 bool export_graph = false) {
   Parser parser{simple_lexer(input), in_ctx};
-  parser.parse_main();
+  parser.parseMain();
 
   if (export_graph) {
-    return parser.export_graphviz();
+    return parser.exportGraphviz();
   }
   return parser.dump();
 }
@@ -34,13 +34,13 @@ std::string transform(const std::string &input,
                       std::vector<std::string> &in_ctx,
                       bool export_graph = false) {
   Parser parser{simple_lexer(input), in_ctx};
-  parser.parse_main();
-  parser.gen_rev();
+  parser.parseMain();
+  parser.genRev();
 
   if (export_graph) {
-    return parser.export_rev_graphviz();
+    return parser.exportRevGraphviz();
   }
-  return parser.dump_rev();
+  return parser.dumpRev();
 }
 
 int main(int argc, char *argv[]) {
