@@ -1,47 +1,8 @@
 #include "fmt/base.h"
-#include "include/parser.h"
-#include <sstream>
-
-static std::vector<std::string> simple_lexer(const std::string &input) {
-  std::vector<std::string> tokens;
-  std::istringstream iss(input);
-  std::string token;
-  while (iss >> token) {
-    // remove all spaces
-    if (token != " ") {
-      tokens.push_back(token);
-    }
-  }
-  return tokens;
-}
-/**
- * @brief Runner that evaluate the graph to some outputs given the input
- * @param input string type input
- * @param in_ctx variables being used
- */
-std::string run(const std::string &input, std::vector<std::string> &in_ctx,
-                bool export_graph = false) {
-  Parser parser{simple_lexer(input), in_ctx};
-  parser.parseMain();
-
-  if (export_graph) {
-    return parser.exportGraphviz();
-  }
-  return parser.dump();
-}
-
-std::string transform(const std::string &input,
-                      std::vector<std::string> &in_ctx,
-                      bool export_graph = false) {
-  Parser parser{simple_lexer(input), in_ctx};
-  parser.parseMain();
-  parser.genRev();
-
-  if (export_graph) {
-    return parser.exportRevGraphviz();
-  }
-  return parser.dumpRev();
-}
+#include "runner.h"
+#include <cstdlib>
+#include <string>
+#include <vector>
 
 int main(int argc, char *argv[]) {
   if (argc != 3) {
@@ -79,9 +40,13 @@ int main(int argc, char *argv[]) {
   };
   std::vector<std::string> name_ctx{"a", "b", "c"};
   if (forward_mode) {
-    fmt::print("{}", run(example, name_ctx, graph_mode));
+    fmt::println("Parser:");
+    fmt::print("{}", Runner::run(example, name_ctx, graph_mode));
+    fmt::println("Lowering");
+    Runner::lower(example, name_ctx);
+
   } else {
-    fmt::print("{}", transform(example, name_ctx, graph_mode));
+    fmt::print("{}", Runner::transform(example, name_ctx, graph_mode));
   }
 
   return 0;

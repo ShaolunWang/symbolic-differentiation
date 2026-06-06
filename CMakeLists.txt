@@ -10,7 +10,13 @@ FetchContent_Declare(
   fmt
   GIT_REPOSITORY https://github.com/fmtlib/fmt
   GIT_TAG        11.2.0)
-FetchContent_MakeAvailable(fmt)
+
+FetchContent_Declare(
+	spdlog
+    GIT_REPOSITORY https://github.com/gabime/spdlog
+	GIT_TAG "v1.17.0"
+)
+FetchContent_MakeAvailable(fmt spdlog)
 
 add_compile_options(-fsanitize=address -g)
 add_link_options(-fsanitize=address)

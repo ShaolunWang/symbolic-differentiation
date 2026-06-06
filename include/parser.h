@@ -47,10 +47,12 @@ private:
   std::vector<std::string> m_outCtx;
   std::vector<std::string> m_input;
   std::vector<std::string>::iterator m_it{m_input.begin()};
+
+  // since there could potentially be multiple entry points, we use a vector
+  // NOTE: this is pretty much depending on free_var count
   std::vector<std::shared_ptr<Operation>> m_operationList;
   std::unordered_map<std::string, std::shared_ptr<Operation>> m_operationCtx;
 
   std::vector<std::shared_ptr<Operation>> m_revOpWorklist;
   std::unordered_map<std::string, std::shared_ptr<Operation>> m_revMap;
-
 };

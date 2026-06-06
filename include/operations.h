@@ -4,7 +4,15 @@
 #include <string>
 #include <utility>
 #include <vector>
-enum class OpTy : uint8_t { Base, BinaryOp, UnaryOp, NamedVar, COUNT };
+// llvm style isa
+template <typename To, typename From> bool isa(From const &f) {
+  return To::classof(&f);
+}
+// overload for shared_ptr
+template <typename To, typename T> bool isa(const std::shared_ptr<T> &ptr) {
+  return ptr && To::classof(ptr.get());
+}
+enum class OpTy : uint8_t { Base, BinaryOp, UnaryOp, NamedVar, RevOp, COUNT };
 enum class Token : uint8_t {
   ADD,
   SUB,
@@ -19,6 +27,13 @@ enum class Token : uint8_t {
 };
 
 struct Operation {
+
+  explicit Operation(OpTy ty) : _ty{ty} {}
+  // typecheck
+  static bool classof(Operation const *) { return true; }
+  OpTy getType() const { return _ty; }
+  OpTy _ty;
+
   virtual std::string dump() const { return ""; };
   // name is used to make different keys when doing lookup in the ctx
   std::string _name;
@@ -58,10 +73,18 @@ struct Operation {
 };
 
 struct RevOp : public Operation {
-  RevOp(std::vector<std::shared_ptr<Operation>> in_operations, std::string name)
-      : operations{std::move(in_operations)} {
+  RevOp(std::vector<std::shared_ptr<Operation>> in_operations, std::string name,
+        OpTy ty = OpTy::RevOp)
+      : Operation(ty), operations{std::move(in_operations)} {
     _name = std::move(name);
   };
+
+  static bool classof(RevOp const *) { return true; }
+
+  static bool classof(Operation const *B) {
+    return B->getType() == OpTy::RevOp;
+  }
+
   std::vector<std::shared_ptr<Operation>> operations;
   std::string dump() const override;
   std::string export_graphviz(const int &current_idx) const override;
@@ -71,10 +94,16 @@ struct RevOp : public Operation {
 
 struct BinaryOp : public Operation {
   BinaryOp(std::shared_ptr<Operation> lhs, const char op,
-           std::shared_ptr<Operation> rhs)
-      : lhs{std::move(lhs)}, rhs{std::move(rhs)}, op{op} {
+           std::shared_ptr<Operation> rhs, OpTy ty = OpTy::BinaryOp)
+      : Operation(ty), lhs{std::move(lhs)}, rhs{std::move(rhs)}, op{op} {
     _name = dump();
   };
+  // typecheck
+  static bool classof(BinaryOp const *) { return true; }
+
+  static bool classof(Operation const *B) {
+    return B->getType() == OpTy::BinaryOp;
+  }
 
   std::string dump() const override;
 
@@ -95,8 +124,16 @@ struct BinaryOp : public Operation {
 
 struct Variable : public Operation {
   OpTy _ty{OpTy::NamedVar};
-  explicit Variable(const std::string &name) : name{name} { _name = name; };
+  explicit Variable(const std::string &name, OpTy ty = OpTy::NamedVar)
+      : Operation(ty), name{name} {
+    _name = name;
+  };
+  // typecheck
+  static bool classof(Variable const *) { return true; }
 
+  static bool classof(Operation const *B) {
+    return B->getType() == OpTy::NamedVar;
+  }
   void
   makeRevOp(std::vector<std::shared_ptr<Operation>> &in_operation) override;
   std::string dump() const override;
@@ -107,10 +144,18 @@ struct Variable : public Operation {
 };
 
 struct UnaryOp : public Operation {
-  UnaryOp(std::shared_ptr<Operation> operation, char op)
-      : operation{std::move(operation)}, op{op} {
+  UnaryOp(std::shared_ptr<Operation> operation, char op,
+          OpTy ty = OpTy::UnaryOp)
+      : Operation(ty), operation{std::move(operation)}, op{op} {
     _name = dump();
   };
+  // typecheck
+  static bool classof(UnaryOp const *) { return true; }
+
+  static bool classof(Operation const *B) {
+    return B->getType() == OpTy::UnaryOp;
+  }
+
   bool hasChild() const override { return true; }
   std::string dump() const override;
   std::string export_graphviz(const int &curr_index) const override;
