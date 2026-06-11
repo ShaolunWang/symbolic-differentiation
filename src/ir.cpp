@@ -1,5 +1,6 @@
 #include "ir.h"
 #include "fmt/base.h"
+#include "spdlog/spdlog.h"
 #include <memory>
 
 void IRLowering::flatten() {
@@ -24,11 +25,11 @@ IRLowering::flatExpr(const std::shared_ptr<Operation> &operation) {
 
 std::shared_ptr<BinaryOp>
 IRLowering::BinaryToFlat(const std::shared_ptr<BinaryOp> &operation) {
-  fmt::println("operation dump: {}", operation->dump());
+  spdlog::info("operation dump: {}", operation->dump());
   auto rhs = flatExpr(operation->rhs);
-  fmt::println("rhs dump {}", rhs->dump());
+  spdlog::info("rhs dump {}", rhs->dump());
   auto lhs = flatExpr(operation->lhs);
-  fmt::println("lhs dump {}", lhs->dump());
+  spdlog::info("lhs dump {}", lhs->dump());
   m_result.emplace_back(rhs);
   m_result.emplace_back(lhs);
   return std::make_shared<BinaryOp>(lhs, operation->op, rhs);
