@@ -41,7 +41,7 @@ void Runner::lower(const std::string &input,
   lowerPass.flatten();
   const std::vector<std::shared_ptr<Operation>> &list = lowerPass.getOpList();
   for (int i = 0; i < list.size(); i++) {
-    std::string str = list[i]->dump();
+    std::string str = list[i]->_name;
     fmt::println("%x{} = {}", i, str);
   }
 }
