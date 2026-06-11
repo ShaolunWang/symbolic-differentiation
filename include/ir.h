@@ -27,7 +27,9 @@ public:
   // flatten entry point
   // this only converts the AST into a vector of operations
   void flatten();
-  std::vector<std::shared_ptr<Operation>> getOpList() const { return m_result; }
+  [[nodiscard]] std::vector<std::shared_ptr<Operation>> getOpList() const {
+    return m_result;
+  }
 
 private:
   std::vector<std::shared_ptr<Operation>> m_workList;

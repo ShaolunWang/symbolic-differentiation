@@ -1,7 +1,4 @@
-#include "fmt/base.h"
-#include "ir.h"
-#include "parser.h"
-#include <sstream>
+#pragma once
 #include <string>
 #include <vector>
 class Runner {

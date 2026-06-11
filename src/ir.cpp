@@ -1,5 +1,4 @@
 #include "ir.h"
-#include "fmt/base.h"
 #include "spdlog/spdlog.h"
 #include <memory>
 

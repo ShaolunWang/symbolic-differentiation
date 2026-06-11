@@ -1,7 +1,9 @@
 #include "runner.h"
 #include "fmt/color.h"
 #include "fmt/format.h"
-#include "spdlog/spdlog.h"
+#include "ir.h"
+#include "parser.h"
+#include <sstream>
 std::vector<std::string> Runner::simple_lexer(const std::string &input) {
   std::vector<std::string> tokens;
   std::istringstream iss(input);
@@ -43,7 +45,7 @@ void Runner::lower(const std::string &input,
   IRLowering lowerPass{parser.getOpList()};
   lowerPass.flatten();
   const std::vector<std::shared_ptr<Operation>> &list = lowerPass.getOpList();
-	fmt::println("Lowering Result: ");
+  fmt::println("Lowering Result: ");
   for (int i = 0; i < list.size(); i++) {
     std::string str = list[i]->_name;
     fmt::print(fmt::emphasis::bold, "%x{}", i);

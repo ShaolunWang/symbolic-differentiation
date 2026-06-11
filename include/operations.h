@@ -31,15 +31,17 @@ struct Operation {
   explicit Operation(OpTy ty) : _ty{ty} {}
   // typecheck
   static bool classof(Operation const *) { return true; }
-  OpTy getType() const { return _ty; }
+  [[nodiscard]] OpTy getType() const { return _ty; }
   OpTy _ty;
 
-  virtual std::string dump() const { return ""; };
+  [[nodiscard]] virtual std::string dump() const { return ""; };
   // name is used to make different keys when doing lookup in the ctx
   std::string _name;
   virtual ~Operation() = default;
 
-  virtual std::string export_graphviz(const int &) const { return ""; }
+  [[nodiscard]] virtual std::string export_graphviz(const int &) const {
+    return "";
+  }
   static std::string convert(const char &op) {
     switch (op) {
     case '+':
@@ -68,7 +70,7 @@ struct Operation {
   std::vector<std::shared_ptr<Operation>> getRevOps();
   std::vector<std::shared_ptr<Operation>> revOp_worklist;
 
-  virtual bool hasChild() const { return false; }
+  [[nodiscard]] virtual bool hasChild() const { return false; }
   virtual std::vector<std::shared_ptr<Operation>> getChilds() { return {}; };
 };
 
@@ -86,10 +88,11 @@ struct RevOp : public Operation {
   }
 
   std::vector<std::shared_ptr<Operation>> operations;
-  std::string dump() const override;
-  std::string export_graphviz(const int &current_idx) const override;
+  [[nodiscard]] std::string dump() const override;
+  [[nodiscard]] std::string
+  export_graphviz(const int &current_idx) const override;
 
-  bool hasChild() const override { return true; }
+  [[nodiscard]] bool hasChild() const override { return true; }
 };
 
 struct BinaryOp : public Operation {
@@ -105,9 +108,10 @@ struct BinaryOp : public Operation {
     return B->getType() == OpTy::BinaryOp;
   }
 
-  std::string dump() const override;
+  [[nodiscard]] std::string dump() const override;
 
-  std::string export_graphviz(const int &curr_index) const override;
+  [[nodiscard]] std::string
+  export_graphviz(const int &curr_index) const override;
 
   std::shared_ptr<Operation> lhs;
   std::shared_ptr<Operation> rhs;
@@ -116,7 +120,7 @@ struct BinaryOp : public Operation {
   void
   makeRevOp(std::vector<std::shared_ptr<Operation>> &in_operation) override;
 
-  bool hasChild() const override { return true; }
+  [[nodiscard]] bool hasChild() const override { return true; }
   std::vector<std::shared_ptr<Operation>> getChilds() override {
     return {lhs, rhs};
   };
@@ -136,11 +140,12 @@ struct Variable : public Operation {
   }
   void
   makeRevOp(std::vector<std::shared_ptr<Operation>> &in_operation) override;
-  std::string dump() const override;
-  std::string export_graphviz(const int &curr_index) const override;
+  [[nodiscard]] std::string dump() const override;
+  [[nodiscard]] std::string
+  export_graphviz(const int &curr_index) const override;
   std::string name;
 
-  bool hasChild() const override { return false; }
+  [[nodiscard]] bool hasChild() const override { return false; }
 };
 
 struct UnaryOp : public Operation {
@@ -156,9 +161,10 @@ struct UnaryOp : public Operation {
     return B->getType() == OpTy::UnaryOp;
   }
 
-  bool hasChild() const override { return true; }
-  std::string dump() const override;
-  std::string export_graphviz(const int &curr_index) const override;
+  [[nodiscard]] bool hasChild() const override { return true; }
+  [[nodiscard]] std::string dump() const override;
+  [[nodiscard]] std::string
+  export_graphviz(const int &curr_index) const override;
   void
   makeRevOp(std::vector<std::shared_ptr<Operation>> &in_operation) override;
   std::shared_ptr<Operation> operation;

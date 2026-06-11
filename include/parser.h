@@ -17,12 +17,12 @@ public:
       : m_nameCtx{free_var}, m_input{input} {};
   void parseMain();
   void genRev();
-  std::string dump() const;
-  std::string dumpRev() const;
+  [[nodiscard]] std::string dump() const;
+  [[nodiscard]] std::string dumpRev() const;
 
   std::string exportGraphviz();
   std::string exportRevGraphviz();
-  std::vector<std::shared_ptr<Operation>> getOpList() const {
+  [[nodiscard]] std::vector<std::shared_ptr<Operation>> getOpList() const {
     return m_operationList;
   }
 
