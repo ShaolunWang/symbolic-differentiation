@@ -21,17 +21,19 @@ IRLowering::flatExpr(const std::shared_ptr<Operation> &operation) {
     flat = operation;
     m_result.emplace_back(operation);
   }
-	
+
   return flat;
 }
 
 std::shared_ptr<BinaryOp>
 IRLowering::BinaryToFlat(const std::shared_ptr<BinaryOp> &operation) {
-
-  auto lhs = flatExpr(operation->lhs);
+	fmt::println("operation dump: {}", operation->dump());
   auto rhs = flatExpr(operation->rhs);
-  m_result.emplace_back(lhs);
+  fmt::println("rhs dump {}", rhs->dump());
+  auto lhs = flatExpr(operation->lhs);
+  fmt::println("lhs dump {}", lhs->dump());
   m_result.emplace_back(rhs);
+  m_result.emplace_back(lhs);
   return std::make_shared<BinaryOp>(lhs, operation->op, rhs);
 }
 std::shared_ptr<UnaryOp>
