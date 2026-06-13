@@ -16,4 +16,3 @@ forward_graph:
 	./build/ad 0 1 > out.dot &&  dot -Tsvg out.dot > out.svg
 rev_graph:
 	./build/ad 1 1 > rev.dot &&  dot -Tsvg rev.dot > rev.svg
-

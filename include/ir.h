@@ -5,6 +5,7 @@
 
 #pragma once
 #include "operations.h"
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -30,6 +31,8 @@ public:
   [[nodiscard]] std::vector<std::shared_ptr<Operation>> getOpList() const {
     return m_result;
   }
+  [[nodiscard]] std::shared_ptr<Operation>
+  fromSymbolMap(const std::shared_ptr<Operation> &operation);
 
 private:
   std::vector<std::shared_ptr<Operation>> m_workList;
@@ -41,4 +44,5 @@ private:
   BinaryToFlat(const std::shared_ptr<BinaryOp> &operation);
   std::shared_ptr<UnaryOp>
   UnaryToFlat(const std::shared_ptr<UnaryOp> &operation);
+  std::unordered_map<std::string_view, std::shared_ptr<Operation>> m_symbolMap;
 };

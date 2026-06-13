@@ -9,14 +9,29 @@ void IRLowering::flatten() {
   }
 }
 std::shared_ptr<Operation>
+IRLowering::fromSymbolMap(const std::shared_ptr<Operation> &operation) {
+
+  // if we already have it, we replace the current operation
+  // with the one we have in the symbol map
+  if (m_symbolMap.contains(operation->_name)) {
+    return m_symbolMap[operation->_name];
+  }
+  // otherwise, we add it back into the symbol map
+  m_symbolMap.emplace(operation->_name, operation);
+  return operation;
+}
+
+std::shared_ptr<Operation>
 IRLowering::flatExpr(const std::shared_ptr<Operation> &operation) {
   std::shared_ptr<Operation> flat = nullptr;
   if (isa<BinaryOp>(operation)) {
-    flat = BinaryToFlat(std::dynamic_pointer_cast<BinaryOp>(operation));
+    flat = fromSymbolMap(
+        BinaryToFlat(std::dynamic_pointer_cast<BinaryOp>(operation)));
   } else if (isa<UnaryOp>(operation)) {
-    flat = UnaryToFlat(std::dynamic_pointer_cast<UnaryOp>(operation));
+    flat = fromSymbolMap(
+        UnaryToFlat(std::dynamic_pointer_cast<UnaryOp>(operation)));
   } else if (isa<Variable>(operation)) {
-    flat = operation;
+    flat = fromSymbolMap(operation);
   }
 
   return flat;
@@ -25,17 +40,19 @@ IRLowering::flatExpr(const std::shared_ptr<Operation> &operation) {
 std::shared_ptr<BinaryOp>
 IRLowering::BinaryToFlat(const std::shared_ptr<BinaryOp> &operation) {
   spdlog::info("operation dump: {}", operation->dump());
-  auto rhs = flatExpr(operation->rhs);
+  auto rhs = fromSymbolMap(flatExpr(operation->rhs));
   spdlog::info("rhs dump {}", rhs->dump());
-  auto lhs = flatExpr(operation->lhs);
+  auto lhs = fromSymbolMap(flatExpr(operation->lhs));
   spdlog::info("lhs dump {}", lhs->dump());
+
   m_result.emplace_back(rhs);
   m_result.emplace_back(lhs);
+
   return std::make_shared<BinaryOp>(lhs, operation->op, rhs);
 }
 std::shared_ptr<UnaryOp>
 IRLowering::UnaryToFlat(const std::shared_ptr<UnaryOp> &operation) {
-  auto newOperation = flatExpr(operation->operation);
+  auto newOperation = fromSymbolMap(flatExpr(operation->operation));
   m_result.emplace_back(newOperation);
   return std::make_shared<UnaryOp>(newOperation, operation->op);
 }
