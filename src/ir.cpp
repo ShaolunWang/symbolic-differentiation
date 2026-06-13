@@ -14,9 +14,11 @@ IRLowering::fromSymbolMap(const std::shared_ptr<Operation> &operation) {
   // if we already have it, we replace the current operation
   // with the one we have in the symbol map
   if (m_symbolMap.contains(operation->_name)) {
+    spdlog::info("SymbolMap: Hit {}", operation->_name);
     return m_symbolMap[operation->_name];
   }
   // otherwise, we add it back into the symbol map
+  spdlog::info("SymbolMap: Miss {}", operation->_name);
   m_symbolMap.emplace(operation->_name, operation);
   return operation;
 }
@@ -39,11 +41,11 @@ IRLowering::flatExpr(const std::shared_ptr<Operation> &operation) {
 
 std::shared_ptr<BinaryOp>
 IRLowering::BinaryToFlat(const std::shared_ptr<BinaryOp> &operation) {
-  spdlog::info("operation dump: {}", operation->dump());
-  auto rhs = fromSymbolMap(flatExpr(operation->rhs));
-  spdlog::info("rhs dump {}", rhs->dump());
-  auto lhs = fromSymbolMap(flatExpr(operation->lhs));
-  spdlog::info("lhs dump {}", lhs->dump());
+  spdlog::info("operation: {}", operation->dump());
+  auto rhs = flatExpr(operation->rhs);
+  spdlog::info("rhs: {}", rhs->dump());
+  auto lhs = flatExpr(operation->lhs);
+  spdlog::info("lhs: {}", lhs->dump());
 
   m_result.emplace_back(rhs);
   m_result.emplace_back(lhs);
@@ -52,7 +54,7 @@ IRLowering::BinaryToFlat(const std::shared_ptr<BinaryOp> &operation) {
 }
 std::shared_ptr<UnaryOp>
 IRLowering::UnaryToFlat(const std::shared_ptr<UnaryOp> &operation) {
-  auto newOperation = fromSymbolMap(flatExpr(operation->operation));
+  auto newOperation = flatExpr(operation->operation);
   m_result.emplace_back(newOperation);
   return std::make_shared<UnaryOp>(newOperation, operation->op);
 }

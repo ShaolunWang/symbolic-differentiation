@@ -85,6 +85,5 @@ add_executable(
 )
 target_link_libraries(
         ad
-		fmt::fmt
 		ad_lib
 )

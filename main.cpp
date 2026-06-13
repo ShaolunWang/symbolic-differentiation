@@ -2,9 +2,12 @@
 #include "runner.h"
 #include <cstdlib>
 #include <string>
+#include "spdlog/spdlog.h"
 #include <vector>
 
 int main(int argc, char *argv[]) {
+	
+  spdlog::set_pattern("[%^%l%$] %v");
   if (argc != 3) {
     fmt::println("`ad 0 0` to generate forward mode, without graphviz output ",
                  "`ad 0 1` to generate forward mode, with graphviz output ");
